@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <dt-bindings/zmk/mouse.h>
+
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 1500  // default: 600
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 20    // default: 10
+
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
@@ -12,8 +17,8 @@
 &mmv { time-to-max-speed-ms = <450>; };
 
 &mt {
-    tapping-term-ms = <125>;
     flavor = "balanced";
+    tapping-term-ms = <125>;
 };
 
 / {
@@ -21,6 +26,12 @@
 
     combos {
         compatible = "zmk,combos";
+
+        COMBO_ENDHOME {
+            bindings = <&endhome>;
+            key-positions = <6 7>;
+            layers = <2>;
+        };
 
         JK2GRESC {
             bindings = <&gresc>;
@@ -36,12 +47,6 @@
         COMBO_BT_CLR {
             bindings = <&bt BT_CLR>;
             key-positions = <16 17 28>;
-            layers = <2>;
-        };
-
-        COMBO_ENDHOME {
-            bindings = <&endhome>;
-            key-positions = <6 7>;
             layers = <2>;
         };
     };
@@ -123,13 +128,13 @@
     keymap {
         compatible = "zmk,keymap";
 
-        Default {
+        Base {
             // -----------------------------------------------------------------
             // |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U  |  I  |  O  |  P  |
             // |  A  |  S  |  D  |  F  |  G  |   |  H  |  J  |  K  |  L  |  ;  |
             // |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M  |  ,  |  .  |  /  |
             //             | GUI | LWR | SPC |   | ENT | RSE | ALT |
-
+            display-name = "Base";
             bindings = <
   &kp Q  &kp W  &kp E           &kp R                      &kp T          &kp Y        &kp U                &kp I          &kp O    &kp P
   &kp A  &kp S  &kp D           &kp F                      &kp G          &kp H        &kp J                &kp K          &kp L    &mt RCTRL SEMI
@@ -139,6 +144,7 @@
         };
 
         Numeric {
+            display-name = "Numeric";
             bindings = <
   &kp N1  &kp N2     &kp N3         &kp N4   &kp N5              &kp NUMBER_6       &kp N7     &kp N8     &kp N9            &kp N0
   &trans  &kp GRAVE  &kp BACKSLASH  &kp TAB  &kp LEFT_BRACKET    &kp RIGHT_BRACKET  &kp MINUS  &kp EQUAL  &kp SINGLE_QUOTE  &trans
@@ -148,6 +154,7 @@
         };
 
         Functional {
+            display-name = "Functional";
             bindings = <
   &kp F1   &kp F2   &kp F3      &kp F4      &kp F5     &kp C_AC_BACK  &pgscrl_dn        &pgscrl_up    &kp C_AC_FORWARD  &kp PRINTSCREEN
   &kp F6   &kp F7   &kp F8      &kp F9      &kp F10    &sprleft       &sprdown          &sprup        &sprright         &trans
