@@ -33,34 +33,16 @@
             layers = <2>;
         };
 
-        BT_SEL_0 {
-            bindings = <&bt BT_SEL 0>;
-            key-positions = <31 34 0>;
-        };
-
-        BT_SEL_1 {
-            bindings = <&bt BT_SEL 1>;
-            key-positions = <31 34 1>;
-        };
-
-        BT_SEL_2 {
-            bindings = <&bt BT_SEL 2>;
-            key-positions = <31 34 2>;
-        };
-
-        BT_SEL_3 {
-            bindings = <&bt BT_SEL 3>;
-            key-positions = <31 34 3>;
-        };
-
-        BT_SEL_4 {
-            bindings = <&bt BT_SEL 4>;
-            key-positions = <31 34 4>;
-        };
-
         COMBO_BT_CLR {
             bindings = <&bt BT_CLR>;
-            key-positions = <31 34 32 33>;
+            key-positions = <16 17 28>;
+            layers = <2>;
+        };
+
+        COMBO_ENDHOME {
+            bindings = <&endhome>;
+            key-positions = <6 7>;
+            layers = <2>;
         };
     };
 
@@ -110,9 +92,9 @@
             mods = <(MOD_LCTL|MOD_RCTL)>;
         };
 
-        pgscrl_down: pgscrl_down {
+        pgscrl_dn: pgscrl_dn {
             compatible = "zmk,behavior-mod-morph";
-            label = "PGSCRL_DOWN";
+            label = "PGSCRL_DN";
             bindings = <&msc SCRL_DOWN>, <&kp PAGE_DOWN>;
 
             #binding-cells = <0>;
@@ -123,6 +105,15 @@
             compatible = "zmk,behavior-mod-morph";
             label = "PGSCRL_UP";
             bindings = <&msc SCRL_UP>, <&kp PAGE_UP>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        endhome: endhome {
+            compatible = "zmk,behavior-mod-morph";
+            label = "ENDHOME";
+            bindings = <&kp HOME>, <&kp END>;
 
             #binding-cells = <0>;
             mods = <(MOD_LSFT|MOD_RSFT)>;
@@ -158,10 +149,10 @@
 
         Functional {
             bindings = <
-  &kp F1   &kp F2   &kp F3  &kp F4  &kp F5     &kp C_AC_BACK  &pgscrl_down      &pgscrl_up    &kp C_AC_FORWARD  &kp PRINTSCREEN
-  &kp F6   &kp F7   &kp F8  &kp F9  &kp F10    &sprleft       &sprdown          &sprup        &sprright         &trans
-  &kp F11  &kp F12  &trans  &trans  &trans     &mkp LCLK      &kp C_VOL_DN      &kp C_VOL_UP  &mkp RCLK         &trans
-                    &trans  &trans  &trans     &trans         &kp C_PLAY_PAUSE  &mkp MCLK
+  &kp F1   &kp F2   &kp F3      &kp F4      &kp F5     &kp C_AC_BACK  &pgscrl_dn        &pgscrl_up    &kp C_AC_FORWARD  &kp PRINTSCREEN
+  &kp F6   &kp F7   &kp F8      &kp F9      &kp F10    &sprleft       &sprdown          &sprup        &sprright         &trans
+  &kp F11  &kp F12  &bt BT_PRV  &bt BT_NXT  &trans     &mkp LCLK      &kp C_VOL_DN      &kp C_VOL_UP  &mkp RCLK         &trans
+                    &trans      &trans      &trans     &trans         &kp C_PLAY_PAUSE  &mkp MCLK
             >;
         };
     };
