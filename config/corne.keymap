@@ -177,7 +177,7 @@
             bindings = <
   &kp F1   &kp F2   &kp F3        &kp F4  &kp F5     &kp C_AC_BACK  &pgscrl_dn    &pgscrl_up    &kp C_AC_FORWARD  &kp PRINTSCREEN
   &kp F6   &kp F7   &kp F8        &kp F9  &kp F10    &sprleft       &sprdown      &sprup        &sprright         &trans
-  &kp F11  &kp F12  &trans        &trans  &trans     &mkp LCLK      &kp C_VOL_DN  &kp C_VOL_UP  &mkp RCLK         &kp C_PLAY_PAUSE
+  &kp F11  &kp F12  &trans        &trans  &trans     &mkp LCLK      &kp C_VOL_DN  &kp C_VOL_UP  &mkp RCLK         &trans
                     &bt_prevnext  &trans  &trans     &trans         &none         &mkp MCLK
             >;
         };
