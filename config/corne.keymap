@@ -38,8 +38,8 @@
             key-positions = <16 17>;
         };
 
-        COMBO_MUTE {
-            bindings = <&kp K_MUTE>;
+        PP_PAUSE {
+            bindings = <&playpause_mute>;
             key-positions = <26 27>;
             layers = <2>;
         };
@@ -131,6 +131,15 @@
 
             #binding-cells = <0>;
             mods = <(MOD_LSFT)>;
+        };
+
+        playpause_mute: playpause_mute {
+            compatible = "zmk,behavior-mod-morph";
+            label = "PLAYPAUSE_MUTE";
+            bindings = <&kp K_MUTE>, <&kp K_PLAY_PAUSE>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
         };
     };
 
