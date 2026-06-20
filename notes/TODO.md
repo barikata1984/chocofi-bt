@@ -4,6 +4,7 @@
 
 - [ ] ディープスリープ有効化後の実機検証(15 分無操作 → ディープスリープ遷移と任意キー押下による復帰)
 - [ ] 必要なら `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=y` を追加して nice!view を 30 秒で消灯させるかを判断(消費電力上の優先度は低い)
+- [ ] D21 未接続確認: `corne_right.overlay`(D21 削除・col-offset=7)を右手側にフラッシュし全キー動作を確認 → D21 が FJ08K ADC に転用可能なことを実証
 - [ ] FJ08K-B10K 実装: PCB トレースカット + ジャンパ線(Col 4: D20 → D16)の実機加工
 - [ ] FJ08K-B10K 実装: `zmk-analog-input-driver` + `zmk-input-processor-xyz` (badjeff) を `config/west.yml` へ追加(revision 確定済み)
 - [ ] FJ08K-B10K 実装: overlay 命名問題の方針決定 — 案 A (keymap 集約) vs 案 B (overlay ファイル分離) を確定し devicetree 実装に着手

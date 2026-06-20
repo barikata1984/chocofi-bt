@@ -1,0 +1,378 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 720" font-family="monospace" font-size="13">
+  <style>
+    .title { font-size: 18px; font-weight: bold; fill: #222; }
+    .subtitle { font-size: 13px; fill: #555; }
+    .pin-label { font-size: 12px; fill: #333; text-anchor: end; }
+    .pin-label-r { font-size: 12px; fill: #333; text-anchor: start; }
+    .gpio-label { font-size: 11px; fill: #666; text-anchor: end; }
+    .gpio-label-r { font-size: 11px; fill: #666; text-anchor: start; }
+    .role-row { font-size: 11px; fill: #c22; font-weight: bold; }
+    .role-col { font-size: 11px; fill: #1a6; font-weight: bold; }
+    .role-other { font-size: 11px; fill: #888; }
+    .mcu-body { fill: #2a2a2a; rx: 8; }
+    .pin-dot { fill: #d4af37; }
+    .pin-dot-row { fill: #e55; }
+    .pin-dot-col { fill: #2a2; }
+    .wire { stroke-width: 1.5; fill: none; }
+    .wire-row { stroke: #e55; stroke-dasharray: 6,3; }
+    .wire-col { stroke: #2a2; stroke-dasharray: 6,3; }
+    .matrix-cell { fill: #f8f8f0; stroke: #ccc; stroke-width: 1; }
+    .matrix-header { fill: #e8e8e0; stroke: #bbb; stroke-width: 1; }
+    .matrix-text { font-size: 11px; fill: #333; text-anchor: middle; }
+    .matrix-title { font-size: 13px; fill: #222; font-weight: bold; }
+    .legend-box { stroke: #ccc; stroke-width: 1; fill: #fafafa; rx: 4; }
+    .section-box { stroke: #ddd; stroke-width: 1; fill: #fefefe; rx: 6; }
+  </style>
+
+  <!-- Title -->
+  <text x="550" y="30" text-anchor="middle" class="title">Chocofi (Corne 5-col) — nice_nano_v2 ピン配線図</text>
+  <text x="550" y="50" text-anchor="middle" class="subtitle">MCU: nRF52840 (nice_nano_v2) / Shield: corne / Transform: five_column_transform / Scan: col2row</text>
+
+  <!-- ==================== LEFT: MCU Diagram ==================== -->
+  <rect x="30" y="70" width="440" height="440" class="section-box"/>
+  <text x="250" y="92" text-anchor="middle" class="matrix-title">nice_nano_v2 Pro Micro ピン配置</text>
+
+  <!-- MCU body -->
+  <rect x="150" y="110" width="200" height="380" class="mcu-body" rx="8"/>
+  <text x="250" y="145" text-anchor="middle" fill="#aaa" font-size="14" font-weight="bold">nice_nano_v2</text>
+  <text x="250" y="165" text-anchor="middle" fill="#777" font-size="11">(nRF52840)</text>
+
+  <!-- USB indicator -->
+  <rect x="220" y="105" width="60" height="14" fill="#555" rx="3"/>
+  <text x="250" y="116" text-anchor="middle" fill="#ccc" font-size="9">USB-C</text>
+
+  <!-- Left pins (top to bottom): D1, D0, GND, GND, D2, D3, D4, D5, D6, D7, D8, D9 -->
+  <!-- Right pins (top to bottom): RAW, GND, RST, VCC, D21, D20, D19, D18, D15, D14, D16, D10 -->
+
+  <!-- Pin positions - left side -->
+  <!-- y positions: 190, 215, 240, 265, 290, 315, 340, 365, 390, 415, 440, 465 -->
+
+  <!-- Left pins -->
+  <g>
+    <!-- D1 = P0.06 -->
+    <circle cx="145" cy="190" r="5" class="pin-dot"/>
+    <text x="135" y="194" class="pin-label">D1</text>
+    <text x="80" y="194" class="gpio-label">P0.06</text>
+    <!-- D0 = P0.08 -->
+    <circle cx="145" cy="215" r="5" class="pin-dot"/>
+    <text x="135" y="219" class="pin-label">D0</text>
+    <text x="80" y="219" class="gpio-label">P0.08</text>
+    <!-- GND -->
+    <circle cx="145" cy="240" r="5" fill="#555"/>
+    <text x="135" y="244" class="pin-label">GND</text>
+    <!-- GND -->
+    <circle cx="145" cy="265" r="5" fill="#555"/>
+    <text x="135" y="269" class="pin-label">GND</text>
+    <!-- D2 = P0.17 -->
+    <circle cx="145" cy="290" r="5" class="pin-dot"/>
+    <text x="135" y="294" class="pin-label">D2</text>
+    <text x="80" y="294" class="gpio-label">P0.17</text>
+    <!-- D3 = P0.20 -->
+    <circle cx="145" cy="315" r="5" class="pin-dot"/>
+    <text x="135" y="319" class="pin-label">D3</text>
+    <text x="80" y="319" class="gpio-label">P0.20</text>
+    <!-- D4 = P0.22 — ROW0 -->
+    <circle cx="145" cy="340" r="5" class="pin-dot-row"/>
+    <text x="135" y="344" class="pin-label">D4</text>
+    <text x="80" y="344" class="gpio-label">P0.22</text>
+    <text x="50" y="344" class="role-row">Row0</text>
+    <!-- D5 = P0.24 — ROW1 -->
+    <circle cx="145" cy="365" r="5" class="pin-dot-row"/>
+    <text x="135" y="369" class="pin-label">D5</text>
+    <text x="80" y="369" class="gpio-label">P0.24</text>
+    <text x="50" y="369" class="role-row">Row1</text>
+    <!-- D6 = P1.00 — ROW2 -->
+    <circle cx="145" cy="390" r="5" class="pin-dot-row"/>
+    <text x="135" y="394" class="pin-label">D6</text>
+    <text x="80" y="394" class="gpio-label">P1.00</text>
+    <text x="50" y="394" class="role-row">Row2</text>
+    <!-- D7 = P0.11 — ROW3 -->
+    <circle cx="145" cy="415" r="5" class="pin-dot-row"/>
+    <text x="135" y="419" class="pin-label">D7</text>
+    <text x="80" y="419" class="gpio-label">P0.11</text>
+    <text x="50" y="419" class="role-row">Row3</text>
+    <!-- D8 = P1.04 -->
+    <circle cx="145" cy="440" r="5" class="pin-dot"/>
+    <text x="135" y="444" class="pin-label">D8</text>
+    <text x="80" y="444" class="gpio-label">P1.04</text>
+    <!-- D9 = P1.06 -->
+    <circle cx="145" cy="465" r="5" class="pin-dot"/>
+    <text x="135" y="469" class="pin-label">D9</text>
+    <text x="80" y="469" class="gpio-label">P1.06</text>
+  </g>
+
+  <!-- Right pins -->
+  <g>
+    <!-- RAW -->
+    <circle cx="355" cy="190" r="5" fill="#c44"/>
+    <text x="365" y="194" class="pin-label-r">RAW</text>
+    <!-- GND -->
+    <circle cx="355" cy="215" r="5" fill="#555"/>
+    <text x="365" y="219" class="pin-label-r">GND</text>
+    <!-- RST -->
+    <circle cx="355" cy="240" r="5" fill="#888"/>
+    <text x="365" y="244" class="pin-label-r">RST</text>
+    <!-- VCC -->
+    <circle cx="355" cy="265" r="5" fill="#c44"/>
+    <text x="365" y="269" class="pin-label-r">VCC</text>
+    <!-- D21 = P0.31 — COL0 -->
+    <circle cx="355" cy="290" r="5" class="pin-dot-col"/>
+    <text x="365" y="294" class="pin-label-r">D21</text>
+    <text x="410" y="294" class="gpio-label-r">P0.31</text>
+    <text x="455" y="294" class="role-col">Col0</text>
+    <!-- D20 = P0.29 — COL1 -->
+    <circle cx="355" cy="315" r="5" class="pin-dot-col"/>
+    <text x="365" y="319" class="pin-label-r">D20</text>
+    <text x="410" y="319" class="gpio-label-r">P0.29</text>
+    <text x="455" y="319" class="role-col">Col1</text>
+    <!-- D19 = P0.02 — COL2 -->
+    <circle cx="355" cy="340" r="5" class="pin-dot-col"/>
+    <text x="365" y="344" class="pin-label-r">D19</text>
+    <text x="410" y="344" class="gpio-label-r">P0.02</text>
+    <text x="455" y="344" class="role-col">Col2</text>
+    <!-- D18 = P1.15 — COL3 -->
+    <circle cx="355" cy="365" r="5" class="pin-dot-col"/>
+    <text x="365" y="369" class="pin-label-r">D18</text>
+    <text x="410" y="369" class="gpio-label-r">P1.15</text>
+    <text x="455" y="369" class="role-col">Col3</text>
+    <!-- D15 = P1.13 — COL4 -->
+    <circle cx="355" cy="390" r="5" class="pin-dot-col"/>
+    <text x="365" y="394" class="pin-label-r">D15</text>
+    <text x="410" y="394" class="gpio-label-r">P1.13</text>
+    <text x="455" y="394" class="role-col">Col4</text>
+    <!-- D14 = P1.11 — COL5 -->
+    <circle cx="355" cy="415" r="5" class="pin-dot-col"/>
+    <text x="365" y="419" class="pin-label-r">D14</text>
+    <text x="410" y="419" class="gpio-label-r">P1.11</text>
+    <text x="455" y="419" class="role-col">Col5</text>
+    <!-- D16 = P0.10 -->
+    <circle cx="355" cy="440" r="5" class="pin-dot"/>
+    <text x="365" y="444" class="pin-label-r">D16</text>
+    <text x="410" y="444" class="gpio-label-r">P0.10</text>
+    <!-- D10 = P0.09 -->
+    <circle cx="355" cy="465" r="5" class="pin-dot"/>
+    <text x="365" y="469" class="pin-label-r">D10</text>
+    <text x="410" y="469" class="gpio-label-r">P0.09</text>
+  </g>
+
+  <!-- ==================== RIGHT: Key Matrix ==================== -->
+  <rect x="510" y="70" width="570" height="440" class="section-box"/>
+  <text x="795" y="92" text-anchor="middle" class="matrix-title">キーマトリクス (片側 / col2row)</text>
+  <text x="795" y="108" text-anchor="middle" class="subtitle">five_column_transform: Col0 を除外 → Col1~Col5 の 5列を使用</text>
+
+  <!-- Column headers -->
+  <rect x="610" y="120" width="75" height="25" class="matrix-header" fill="#e0e0d8" stroke="#aaa"/>
+  <text x="647" y="137" class="matrix-text" fill="#999" text-decoration="line-through">Col0 (D21)</text>
+  <rect x="690" y="120" width="75" height="25" class="matrix-header"/>
+  <text x="727" y="137" class="matrix-text">Col1 (D20)</text>
+  <rect x="770" y="120" width="75" height="25" class="matrix-header"/>
+  <text x="807" y="137" class="matrix-text">Col2 (D19)</text>
+  <rect x="850" y="120" width="75" height="25" class="matrix-header"/>
+  <text x="887" y="137" class="matrix-text">Col3 (D18)</text>
+  <rect x="930" y="120" width="75" height="25" class="matrix-header"/>
+  <text x="967" y="137" class="matrix-text">Col4 (D15)</text>
+  <rect x="1010" y="120" width="75" height="25" class="matrix-header"/>
+  <text x="1047" y="137" class="matrix-text">Col5 (D14)</text>
+
+  <!-- Row headers + cells -->
+  <!-- Row 0 (D4) -->
+  <rect x="535" y="150" width="70" height="30" class="matrix-header"/>
+  <text x="570" y="170" class="matrix-text">Row0 (D4)</text>
+  <rect x="610" y="150" width="75" height="30" class="matrix-cell" fill="#e8e8e0" opacity="0.5"/>
+  <text x="647" y="170" class="matrix-text" fill="#bbb">—</text>
+  <rect x="690" y="150" width="75" height="30" class="matrix-cell"/>
+  <text x="727" y="170" class="matrix-text" font-weight="bold">Q</text>
+  <rect x="770" y="150" width="75" height="30" class="matrix-cell"/>
+  <text x="807" y="170" class="matrix-text" font-weight="bold">W</text>
+  <rect x="850" y="150" width="75" height="30" class="matrix-cell"/>
+  <text x="887" y="170" class="matrix-text" font-weight="bold">E</text>
+  <rect x="930" y="150" width="75" height="30" class="matrix-cell"/>
+  <text x="967" y="170" class="matrix-text" font-weight="bold">R</text>
+  <rect x="1010" y="150" width="75" height="30" class="matrix-cell"/>
+  <text x="1047" y="170" class="matrix-text" font-weight="bold">T</text>
+
+  <!-- Row 1 (D5) -->
+  <rect x="535" y="185" width="70" height="30" class="matrix-header"/>
+  <text x="570" y="205" class="matrix-text">Row1 (D5)</text>
+  <rect x="610" y="185" width="75" height="30" class="matrix-cell" fill="#e8e8e0" opacity="0.5"/>
+  <text x="647" y="205" class="matrix-text" fill="#bbb">—</text>
+  <rect x="690" y="185" width="75" height="30" class="matrix-cell"/>
+  <text x="727" y="205" class="matrix-text" font-weight="bold">A</text>
+  <rect x="770" y="185" width="75" height="30" class="matrix-cell"/>
+  <text x="807" y="205" class="matrix-text" font-weight="bold">S</text>
+  <rect x="850" y="185" width="75" height="30" class="matrix-cell"/>
+  <text x="887" y="205" class="matrix-text" font-weight="bold">D</text>
+  <rect x="930" y="185" width="75" height="30" class="matrix-cell"/>
+  <text x="967" y="205" class="matrix-text" font-weight="bold">F</text>
+  <rect x="1010" y="185" width="75" height="30" class="matrix-cell"/>
+  <text x="1047" y="205" class="matrix-text" font-weight="bold">G</text>
+
+  <!-- Row 2 (D6) -->
+  <rect x="535" y="220" width="70" height="30" class="matrix-header"/>
+  <text x="570" y="240" class="matrix-text">Row2 (D6)</text>
+  <rect x="610" y="220" width="75" height="30" class="matrix-cell" fill="#e8e8e0" opacity="0.5"/>
+  <text x="647" y="240" class="matrix-text" fill="#bbb">—</text>
+  <rect x="690" y="220" width="75" height="30" class="matrix-cell"/>
+  <text x="727" y="240" class="matrix-text" font-weight="bold">Z</text>
+  <rect x="770" y="220" width="75" height="30" class="matrix-cell"/>
+  <text x="807" y="240" class="matrix-text" font-weight="bold">X</text>
+  <rect x="850" y="220" width="75" height="30" class="matrix-cell"/>
+  <text x="887" y="240" class="matrix-text" font-weight="bold">C</text>
+  <rect x="930" y="220" width="75" height="30" class="matrix-cell"/>
+  <text x="967" y="240" class="matrix-text" font-weight="bold">V</text>
+  <rect x="1010" y="220" width="75" height="30" class="matrix-cell"/>
+  <text x="1047" y="240" class="matrix-text" font-weight="bold">B</text>
+
+  <!-- Row 3 (D7) - thumb keys -->
+  <rect x="535" y="255" width="70" height="30" class="matrix-header"/>
+  <text x="570" y="275" class="matrix-text">Row3 (D7)</text>
+  <rect x="610" y="255" width="75" height="30" class="matrix-cell" fill="#e8e8e0" opacity="0.5"/>
+  <text x="647" y="275" class="matrix-text" fill="#bbb">—</text>
+  <rect x="690" y="255" width="75" height="30" class="matrix-cell" fill="#e8e8e0" opacity="0.5"/>
+  <text x="727" y="275" class="matrix-text" fill="#bbb">—</text>
+  <rect x="770" y="255" width="75" height="30" class="matrix-cell" fill="#e8e8e0" opacity="0.5"/>
+  <text x="807" y="275" class="matrix-text" fill="#bbb">—</text>
+  <rect x="850" y="255" width="75" height="30" class="matrix-cell"/>
+  <text x="887" y="275" class="matrix-text" font-weight="bold">LSFT</text>
+  <rect x="930" y="255" width="75" height="30" class="matrix-cell"/>
+  <text x="967" y="275" class="matrix-text" font-weight="bold">LGUI</text>
+  <rect x="1010" y="255" width="75" height="30" class="matrix-cell"/>
+  <text x="1047" y="275" class="matrix-text" font-weight="bold">SPC/L1</text>
+
+  <!-- Mapping table -->
+  <text x="530" y="320" class="matrix-title">Pro Micro → nRF52840 GPIO 対応表</text>
+
+  <!-- Table header -->
+  <rect x="530" y="330" width="80" height="22" class="matrix-header"/>
+  <text x="570" y="346" class="matrix-text" font-weight="bold">Pro Micro</text>
+  <rect x="614" y="330" width="90" height="22" class="matrix-header"/>
+  <text x="659" y="346" class="matrix-text" font-weight="bold">nRF GPIO</text>
+  <rect x="708" y="330" width="80" height="22" class="matrix-header"/>
+  <text x="748" y="346" class="matrix-text" font-weight="bold">役割</text>
+  <rect x="800" y="330" width="20" height="22" fill="none"/>
+  <rect x="825" y="330" width="80" height="22" class="matrix-header"/>
+  <text x="865" y="346" class="matrix-text" font-weight="bold">Pro Micro</text>
+  <rect x="909" y="330" width="90" height="22" class="matrix-header"/>
+  <text x="954" y="346" class="matrix-text" font-weight="bold">nRF GPIO</text>
+  <rect x="1003" y="330" width="80" height="22" class="matrix-header"/>
+  <text x="1043" y="346" class="matrix-text" font-weight="bold">役割</text>
+
+  <!-- Row entries - Left column -->
+  <!-- D4 -->
+  <rect x="530" y="355" width="80" height="20" class="matrix-cell"/>
+  <text x="570" y="369" class="matrix-text">D4</text>
+  <rect x="614" y="355" width="90" height="20" class="matrix-cell"/>
+  <text x="659" y="369" class="matrix-text">P0.22</text>
+  <rect x="708" y="355" width="80" height="20" class="matrix-cell"/>
+  <text x="748" y="369" class="matrix-text" fill="#c22" font-weight="bold">Row 0</text>
+  <!-- D5 -->
+  <rect x="530" y="378" width="80" height="20" class="matrix-cell"/>
+  <text x="570" y="392" class="matrix-text">D5</text>
+  <rect x="614" y="378" width="90" height="20" class="matrix-cell"/>
+  <text x="659" y="392" class="matrix-text">P0.24</text>
+  <rect x="708" y="378" width="80" height="20" class="matrix-cell"/>
+  <text x="748" y="392" class="matrix-text" fill="#c22" font-weight="bold">Row 1</text>
+  <!-- D6 -->
+  <rect x="530" y="401" width="80" height="20" class="matrix-cell"/>
+  <text x="570" y="415" class="matrix-text">D6</text>
+  <rect x="614" y="401" width="90" height="20" class="matrix-cell"/>
+  <text x="659" y="415" class="matrix-text">P1.00</text>
+  <rect x="708" y="401" width="80" height="20" class="matrix-cell"/>
+  <text x="748" y="415" class="matrix-text" fill="#c22" font-weight="bold">Row 2</text>
+  <!-- D7 -->
+  <rect x="530" y="424" width="80" height="20" class="matrix-cell"/>
+  <text x="570" y="438" class="matrix-text">D7</text>
+  <rect x="614" y="424" width="90" height="20" class="matrix-cell"/>
+  <text x="659" y="438" class="matrix-text">P0.11</text>
+  <rect x="708" y="424" width="80" height="20" class="matrix-cell"/>
+  <text x="748" y="438" class="matrix-text" fill="#c22" font-weight="bold">Row 3</text>
+
+  <!-- Col entries - Right column -->
+  <!-- D21 -->
+  <rect x="825" y="355" width="80" height="20" class="matrix-cell"/>
+  <text x="865" y="369" class="matrix-text">D21</text>
+  <rect x="909" y="355" width="90" height="20" class="matrix-cell"/>
+  <text x="954" y="369" class="matrix-text">P0.31</text>
+  <rect x="1003" y="355" width="80" height="20" class="matrix-cell"/>
+  <text x="1043" y="369" class="matrix-text" fill="#1a6" font-weight="bold">Col 0 *</text>
+  <!-- D20 -->
+  <rect x="825" y="378" width="80" height="20" class="matrix-cell"/>
+  <text x="865" y="392" class="matrix-text">D20</text>
+  <rect x="909" y="378" width="90" height="20" class="matrix-cell"/>
+  <text x="954" y="392" class="matrix-text">P0.29</text>
+  <rect x="1003" y="378" width="80" height="20" class="matrix-cell"/>
+  <text x="1043" y="392" class="matrix-text" fill="#1a6" font-weight="bold">Col 1</text>
+  <!-- D19 -->
+  <rect x="825" y="401" width="80" height="20" class="matrix-cell"/>
+  <text x="865" y="415" class="matrix-text">D19</text>
+  <rect x="909" y="401" width="90" height="20" class="matrix-cell"/>
+  <text x="954" y="415" class="matrix-text">P0.02</text>
+  <rect x="1003" y="401" width="80" height="20" class="matrix-cell"/>
+  <text x="1043" y="415" class="matrix-text" fill="#1a6" font-weight="bold">Col 2</text>
+  <!-- D18 -->
+  <rect x="825" y="424" width="80" height="20" class="matrix-cell"/>
+  <text x="865" y="438" class="matrix-text">D18</text>
+  <rect x="909" y="424" width="90" height="20" class="matrix-cell"/>
+  <text x="954" y="438" class="matrix-text">P1.15</text>
+  <rect x="1003" y="424" width="80" height="20" class="matrix-cell"/>
+  <text x="1043" y="438" class="matrix-text" fill="#1a6" font-weight="bold">Col 3</text>
+  <!-- D15 -->
+  <rect x="825" y="447" width="80" height="20" class="matrix-cell"/>
+  <text x="865" y="461" class="matrix-text">D15</text>
+  <rect x="909" y="447" width="90" height="20" class="matrix-cell"/>
+  <text x="954" y="461" class="matrix-text">P1.13</text>
+  <rect x="1003" y="447" width="80" height="20" class="matrix-cell"/>
+  <text x="1043" y="461" class="matrix-text" fill="#1a6" font-weight="bold">Col 4</text>
+  <!-- D14 -->
+  <rect x="825" y="470" width="80" height="20" class="matrix-cell"/>
+  <text x="865" y="484" class="matrix-text">D14</text>
+  <rect x="909" y="470" width="90" height="20" class="matrix-cell"/>
+  <text x="954" y="484" class="matrix-text">P1.11</text>
+  <rect x="1003" y="470" width="80" height="20" class="matrix-cell"/>
+  <text x="1043" y="484" class="matrix-text" fill="#1a6" font-weight="bold">Col 5</text>
+
+  <!-- Footnote for Col 0 -->
+  <text x="830" y="504" font-size="10" fill="#888">* Col 0 は five_column_transform により未使用 (HW 配線は存在)</text>
+
+  <!-- ==================== BOTTOM: Legend ==================== -->
+  <rect x="30" y="530" width="1050" height="65" class="legend-box"/>
+  <text x="50" y="550" font-size="12" fill="#333" font-weight="bold">凡例:</text>
+  <circle cx="110" cy="546" r="5" class="pin-dot-row"/>
+  <text x="120" y="550" font-size="11" fill="#333">行 (Row) GPIO — 出力</text>
+  <circle cx="280" cy="546" r="5" class="pin-dot-col"/>
+  <text x="290" y="550" font-size="11" fill="#333">列 (Col) GPIO — 入力 (ACTIVE_HIGH)</text>
+  <circle cx="510" cy="546" r="5" class="pin-dot"/>
+  <text x="520" y="550" font-size="11" fill="#333">その他のピン (未使用)</text>
+  <circle cx="700" cy="546" r="5" fill="#555"/>
+  <text x="710" y="550" font-size="11" fill="#333">GND</text>
+  <circle cx="780" cy="546" r="5" fill="#c44"/>
+  <text x="790" y="550" font-size="11" fill="#333">電源 (RAW/VCC)</text>
+
+  <text x="50" y="575" font-size="11" fill="#555">スキャン方式: col2row (列→行方向にダイオード配置). 各キースイッチの交差点にダイオードがあり, 列を順にドライブして行で読み取る.</text>
+  <text x="50" y="590" font-size="11" fill="#555">左右通信: BLE (スプリットキーボード). 右側は col_offset=6 でマトリクス列番号をシフト.</text>
+
+  <!-- Source info -->
+  <text x="550" y="620" text-anchor="middle" font-size="10" fill="#aaa">Source: zmkfirmware/zmk v0.3.0 — app/boards/arm/nice_nano/arduino_pro_micro_pins.dtsi, app/boards/shields/corne/corne.dtsi, corne_left.overlay</text>
+
+  <!-- Diode direction diagram (small) -->
+  <rect x="30" y="635" width="1050" height="80" class="legend-box"/>
+  <text x="50" y="658" font-size="12" fill="#333" font-weight="bold">col2row ダイオード方向:</text>
+  <!-- Simple schematic -->
+  <text x="250" y="658" font-size="11" fill="#555">Col (D20等)</text>
+  <line x1="320" y1="654" x2="380" y2="654" stroke="#2a2" stroke-width="2"/>
+  <!-- Diode symbol -->
+  <polygon points="385,648 385,660 400,654" fill="#333"/>
+  <line x1="400" y1="648" x2="400" y2="660" stroke="#333" stroke-width="2"/>
+  <!-- Switch -->
+  <line x1="405" y1="654" x2="430" y2="654" stroke="#333" stroke-width="1.5"/>
+  <line x1="435" y1="644" x2="435" y2="664" stroke="#333" stroke-width="1.5"/>
+  <line x1="445" y1="644" x2="445" y2="664" stroke="#333" stroke-width="1.5"/>
+  <text x="440" y="640" text-anchor="middle" font-size="9" fill="#333">SW</text>
+  <line x1="450" y1="654" x2="480" y2="654" stroke="#333" stroke-width="1.5"/>
+  <line x1="480" y1="654" x2="480" y2="690" stroke="#e55" stroke-width="2"/>
+  <text x="500" y="695" font-size="11" fill="#555">Row (D4等)</text>
+  <line x1="480" y1="690" x2="540" y2="690" stroke="#e55" stroke-width="2"/>
+
+  <text x="600" y="670" font-size="11" fill="#555">ファームウェアが Col ピンを順に HIGH にし,</text>
+  <text x="600" y="688" font-size="11" fill="#555">各 Row ピンの状態を読み取ってキー押下を検出する.</text>
+</svg>

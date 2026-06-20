@@ -267,3 +267,48 @@ nice_view との GPIO/ADC 競合なし. nice_view が使用する SPI ピン(D1 
 
 1. **overlay 命名問題**: `config/corne_right.overlay` が in-tree shield では確実に適用されない可能性(ZMK Issue #1382). 対処案は案 A(devicetree 変更を corne.keymap に集約)と案 B(overlay ファイル分離)の 2 択. 未決定.
 2. **badjeff モジュールの v0.3.0 互換性**:"Zephyr 標準 API のみ使用"と判定していたが, fork 前提で開発されているとの指摘もあり矛盾. 実ビルドでの検証が必要.
+
+---
+
+## 2026-06-20: ハードウェアピン配線の確認と PCB コラムトレース調査
+
+### MCU → Corne シールドのピン対応確認
+
+nice_nano_v2 (nRF52840) と Corne シールドのピン対応を ZMK ソース (`arduino_pro_micro_pins.dtsi`, `corne.dtsi`, `corne_right.overlay`) から確認した.
+
+| 用途 | Pro Micro パッド | nRF52840 GPIO |
+|---|---|---|
+| Row 0 | D4 | P0.22 |
+| Row 1 | D5 | P0.24 |
+| Row 2 | D6 | P1.00 |
+| Row 3 | D7 | P0.11 |
+| Col 1 (inner) | D21 | P0.31 (AIN7) |
+| Col 2 | D20 | P0.29 (AIN5) |
+| Col 3 | D19 | P0.02 (AIN0) |
+| Col 4 | D18 | P1.15 |
+| Col 5 | D15 | P1.13 |
+| Col 6 (outer) | D14 | P1.11 |
+
+スキャン方式は col2row. この対応は PLAN.md の ADC ピン計画と整合している.
+
+ピン対応の概要図を `notes/corne_pinmap.svg` に生成した(MCU ピンアウト, キーマトリクス, Pro Micro → nRF52840 GPIO 対応, col2row の説明を含む).
+
+### Chocofi PCB のコラムトレース構造
+
+pashutk/chocofi のスキーマティックを確認した結果, Chocofi PCB には 5 列キーボードにもかかわらず **6 本のコラムトレース(col0〜col5)が存在する**ことを確認した.
+
+- D21 に対応する col0 トレースは PCB 上に物理的に存在する
+- ただし col0 位置にはキースイッチが配置されていない
+- PLAN.md の"D21 は物理未使用"は"キースイッチに接続されていない"という意味で正確
+
+この構造から, D21 は配線済みトレースを持つが接続先キースイッチがないという状態であり, FJ08K 用 ADC として転用するための PCB 加工は不要である可能性が高い.
+
+### D21 未接続の動作確認用 overlay
+
+D21 がキースイッチに接続されていないことを実機で確認するため, `config/corne_right.overlay` を作成した.
+
+変更内容:
+- `col-gpios` から D21 (P0.31) を削除(6 エントリ → 5 エントリ)
+- `col-offset` を 6 → 7 に変更(右手列番号のオフセット調整)
+
+右手側にフラッシュして全キーが正常動作することを確認できれば, D21 がいずれのキースイッチにも接続されていないことの実証となる. 検証は未実施.
