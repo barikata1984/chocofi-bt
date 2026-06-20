@@ -97,3 +97,173 @@ Adafruit 512 は ADC ピン不足で断念. I2C 経由案(ADS1115 等)も検討�
 - Kconfig: `CONFIG_ZMK_POINTING=y`, `CONFIG_ADC=y`, `CONFIG_ANALOG_INPUT=y`
 
 実装作業は未着手. `notes/TODO.md` 参照.
+
+---
+
+## 2026-06-20: zmk-analog-input-driver (badjeff) 詳細調査
+
+### モジュール基本情報
+
+- リポジトリ: https://github.com/badjeff/zmk-analog-input-driver
+- compatible: `"zmk,analog-input"`
+- ZMK v0.3.0 と互換性あり(Zephyr 標準 input API のみ使用)
+- タグ/リリースなし. コミット SHA `2684f22`(2026-04-06 時点)での固定を推奨
+
+### west.yml 追加例
+
+```yaml
+- name: zmk-analog-input-driver
+  remote: badjeff
+  revision: 2684f22
+```
+
+### devicetree binding の主要プロパティ(各軸子ノード)
+
+| プロパティ | 内容 |
+|---|---|
+| `io-channels` | ADC チャンネル(例: `<&adc 7>` = P0.31/AIN7) |
+| `mv-mid` | 中点電圧 mV(要実測, 理論値 ~1650) |
+| `mv-min-max` | 中点からの最大偏差 mV |
+| `mv-deadzone` | デッドゾーン mV(デフォルト 10) |
+| `evt-type` / `input-code` | 例: `INPUT_EV_REL` / `INPUT_REL_X` |
+| `scale-multiplier` / `scale-divisor` | 感度調整 |
+
+### ソフトウェアアーキテクチャの実現可能性確認
+
+PLAN.md の"共有 dtsi + 右 overlay + 左 overlay + input-split/listener"構成は実現可能と確認.
+ドライバは `input_report()` で Zephyr input イベントを発行するため, `zmk,input-split` にそのまま渡せる.
+
+推奨追加モジュール: `zmk-input-processor-xyz`(BLE 帯域節約のための XY 圧縮). 採否は TODO 検討候補へ.
+
+### 発見した課題
+
+3 件の新規課題を `notes/ISSUES.md` に追加した:
+
+1. **nRF52840 ADC oversampling バグ**: `battery_nrf_vddh.c` の `oversampling = 4` が analog-input-driver と競合し約 1 分後に ADC が stuck する. v0.3.0/main ともに未修正.
+2. **消費電力**: ポーリングモードのため wireless には非推奨と README に明記. `sampling-hz` 低減で緩和可能だが根本解決ではない.
+3. **mv-mid キャリブレーション**: 中点電圧は個体差あり. `CONFIG_ANALOG_INPUT_LOG_DBG_RAW=y` で実測が必要.
+
+ディープスリープ時の GPIO 電源制御は既存 TODO 項目として管理中. ドライバ側に電源制御機能はなく, `regulator-fixed` + PM コールバック等での自前実装が必要な点を確認.
+
+---
+
+## 2026-06-20: devicetree 設計の具体化
+
+ZMK v0.3.0 の input-split / input-listener binding 仕様, Corne シールドの overlay 構造, badjeff の参考実装を調査し, FJ08K 実装に必要な devicetree 記述を確定した.
+
+### binding 仕様の確認
+
+`zmk,input-split`:
+
+| プロパティ | 必須 | 備考 |
+|---|---|---|
+| `reg` | 必須 | 識別整数 |
+| `device` | ペリフェラル側のみ | 入力デバイスの phandle |
+| `input-processors` | 任意 | BLE 送信前のプロセッサ |
+
+`zmk,input-listener`:
+
+| プロパティ | 必須 | 備考 |
+|---|---|---|
+| `device` | 必須 | split 構成では `&joystick_split` |
+| `input-processors` | 任意 | 受信後のプロセッサ |
+
+子ノードでレイヤーごとのオーバーライド可能 (`layers`, `process-next`, `input-processors`).
+
+### ファイル構成の確定
+
+```
+config/
+├── west.yml              # 既存 + badjeff モジュール追加
+├── corne.conf            # 既存(両側共有)
+├── corne_right.conf      # 新規: CONFIG_ADC=y, CONFIG_ANALOG_INPUT=y
+├── corne.keymap          # 既存
+├── corne.dtsi            # 新規: input-split + input-listener 定義(共有)
+├── corne_left.overlay    # 新規: input-listener を enable
+└── corne_right.overlay   # 新規: FJ08K 定義 + input-split 接続 + col-gpios 書き換え
+```
+
+`build.yaml` の変更は不要(ファイル名が正しければビルドシステムが自動検出する).
+
+### overlay 適用の仕組み
+
+- 公式シールド overlay とユーザー overlay は両方適用される(追加適用, 置換ではない)
+- `&kscan0` の `col-gpios` は後勝ちで上書きされる
+- conf は検索順にマッチした全ファイルが累積される
+
+### input-listener の配置方法
+
+- 方法 A: 共有 dtsi で disabled 宣言 → セントラル overlay で enable (ZMK 公式パターン) ← **採用**
+- 方法 B: keymap に直接記述 (badjeff パターン)
+
+方法 A を採用する. `status = "disabled"` で共有 dtsi に宣言し, `corne_left.overlay` で `status = "okay"` に上書きする.
+
+### XYZ 圧縮 (zmk-input-processor-xyz)
+
+- ペリフェラル側: `&zip_xyz` (X+Y → Z パッキング)
+- セントラル側: `&zip_zxy` (Z → X+Y 展開)
+- BLE 転送量を約 50% 削減. オプションだが推奨. 採否は TODO 検討候補として管理中.
+
+### イベントフロー
+
+```
+FJ08K → ADC → anin0 (INPUT_REL_X/Y) → joystick_split (BLE 転送) → joystick_split@セントラル → joystick_listener → HID マウスレポート
+```
+
+### 参考実装
+
+badjeff/zmk-config の corne36 構成で split_inputs の定義方法, input-processors の接続, conf の設定項目を確認した.
+
+---
+
+## 2026-06-20: Kconfig / west.yml / ビルド互換性の確定
+
+devicetree 設計調査(同日第 2 回)に続き, 実装に必要な残り 3 項目を確定した.
+
+### Kconfig 設定
+
+`corne.conf`(共有): 変更不要. 既存の `CONFIG_ZMK_POINTING=y` / `CONFIG_ZMK_DISPLAY=y` / `CONFIG_ZMK_SLEEP=y` で十分.
+
+`corne_right.conf`(新規・ペリフェラル専用):
+
+```ini
+CONFIG_ANALOG_INPUT=y
+CONFIG_ANALOG_INPUT_REPORT_INTERVAL_MIN=22
+```
+
+`CONFIG_ADC` は `ANALOG_INPUT` が自動選択する. `CONFIG_INPUT` は `ZMK_POINTING` が自動選択する. input-split / input-listener / input-processor-xyz の各 Kconfig は DT ノードで自動 enable されるため明示不要.
+
+`corne_left.conf`: 不要(input-listener 等はすべて DT auto-enable).
+
+### west.yml モジュール追加
+
+badjeff remote を追加し, 2 モジュールを固定 SHA で参照する:
+
+```yaml
+remotes:
+  - name: badjeff
+    url-base: https://github.com/badjeff
+
+projects:
+  - name: zmk-analog-input-driver
+    remote: badjeff
+    revision: 2684f22ee7e2168d4393f7e63676912210a796fc
+  - name: zmk-input-processor-xyz
+    remote: badjeff
+    revision: 0f0574f6a6c5b08fa964dff7b957ce67b2e0a9cf
+```
+
+両モジュールとも `zephyr/module.yml` に `depends` 宣言なし. 追加の依存 project は不要.
+
+### ビルド互換性
+
+nice_view との GPIO/ADC 競合なし. nice_view が使用する SPI ピン(D1 CS/P0.06, D2 MOSI/P0.17, D3 SCK/P0.20)と FJ08K が使用する ADC ピン(D20/AIN5, D21/AIN7)は物理的に非重複.
+
+`build.yaml` の変更不要.
+
+### 発見した課題
+
+2 件を `notes/ISSUES.md` に追加した:
+
+1. **overlay 命名問題**: `config/corne_right.overlay` が in-tree shield では確実に適用されない可能性(ZMK Issue #1382). 対処案は案 A(devicetree 変更を corne.keymap に集約)と案 B(overlay ファイル分離)の 2 択. 未決定.
+2. **badjeff モジュールの v0.3.0 互換性**:"Zephyr 標準 API のみ使用"と判定していたが, fork 前提で開発されているとの指摘もあり矛盾. 実ビルドでの検証が必要.

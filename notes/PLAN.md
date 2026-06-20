@@ -34,10 +34,20 @@
   - ソフトウェア: `corne_right.overlay` の `col-gpios` を書き換え (D20 → D16, D21 を削除)
 - **ZMK モジュール**: `zmk-analog-input-driver` (badjeff) を `config/west.yml` へ追加
 - **ソフトウェア構成**:
-  - 共有 `.dtsi`: `zmk,input-split` 定義 + `zmk,input-listener` を disabled で宣言
-  - 右 (ペリフェラル) overlay: FJ08K アナログデバイス定義, input-split へ接続
-  - 左 (セントラル) overlay: `zmk,input-listener` を enable
-  - Kconfig: `CONFIG_ZMK_POINTING=y`, `CONFIG_ADC=y`, `CONFIG_ANALOG_INPUT=y`
+  - `config/corne.dtsi` (新規, 共有): `zmk,input-split` 定義 + `zmk,input-listener` を `status = "disabled"` で宣言
+  - `config/corne_right.overlay` (新規): FJ08K (`zmk,analog-input`) デバイスノード定義, input-split へ接続, `col-gpios` 書き換え (D20 → D16, D21 削除)
+  - `config/corne_left.overlay` (新規): `zmk,input-listener` を `status = "okay"` で enable
+  - `config/corne_right.conf` (新規): `CONFIG_ANALOG_INPUT=y` + `CONFIG_ANALOG_INPUT_REPORT_INTERVAL_MIN=22` のみ記載. `CONFIG_ADC` は `ANALOG_INPUT` が自動選択, `CONFIG_INPUT` は `ZMK_POINTING` が自動選択するため明示しない. input-split / input-listener / input-processor-xyz も DT ノードで自動 enable
+  - `config/corne_left.conf`: 不要(input-listener 等はすべて DT auto-enable)
+  - `config/corne.conf` (既存): 変更不要. `CONFIG_ZMK_POINTING=y` / `CONFIG_ZMK_DISPLAY=y` / `CONFIG_ZMK_SLEEP=y` が既存のまま有効
+  - input-listener の配置方法: 共有 dtsi で disabled 宣言 → セントラル overlay で enable する ZMK 公式パターンを採用
+  - `build.yaml` の変更不要 (ファイル名が正しければビルドシステムが自動検出)
+- **west.yml モジュール追加** (revision 確定済み):
+  - badjeff remote: `url-base: https://github.com/badjeff`
+  - `zmk-analog-input-driver`: revision `2684f22ee7e2168d4393f7e63676912210a796fc`
+  - `zmk-input-processor-xyz`: revision `0f0574f6a6c5b08fa964dff7b957ce67b2e0a9cf`
+  - 両モジュールとも追加の依存 project は不要
+- **overlay 命名問題 (未決定)**: `config/corne_right.overlay` が in-tree shield で確実に適用されない可能性あり(ZMK Issue #1382). 案 A(devicetree 変更を corne.keymap に集約)と案 B(overlay ファイル分離, 現方針)のどちらを採るか確定前に devicetree 実装には着手しない
 
 ### キー入力タイミング方針
 
