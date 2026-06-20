@@ -1,12 +1,12 @@
 # 電源管理調査ログ
 
-ZMK の電源管理関連の Kconfig とビヘイビアに関する調査記録。append-only。
+ZMK の電源管理関連の Kconfig とビヘイビアに関する調査記録. append-only.
 
 ---
 
 ## 2026-05-12: タイムアウト体系の整理とディープスリープ有効化
 
-### ZMK のタイムアウト体系（4 系統）
+### ZMK のタイムアウト体系(4 系統)
 
 | 系統 | 設定例 | 役割 |
 |---|---|---|
@@ -15,21 +15,21 @@ ZMK の電源管理関連の Kconfig とビヘイビアに関する調査記録�
 | コンボ判定 | コンボの `timeout-ms`, `require-prior-idle-ms` | 複数キー同時押し成立窓 |
 | ポインティング | `time-to-max-speed-ms` (`&mmv`) | マウス移動の最大速度到達時間 |
 
-### 本リポジトリの設定状況（調査時点）
+### 本リポジトリの設定状況(調査時点)
 
-- `tapping-term-ms = 125`（`config/corne.keymap:21`、`&mt` グローバル上書き）
-- `time-to-max-speed-ms = 450`（`config/corne.keymap:17`、`&mmv` グローバル上書き）
+- `tapping-term-ms = 125`(`config/corne.keymap:21`, `&mt` グローバル上書き)
+- `time-to-max-speed-ms = 450`(`config/corne.keymap:17`, `&mmv` グローバル上書き)
 - 上記以外のタイムアウト関連 Kconfig は `config/corne.conf` に未記述
 
 ### アイドルとディープスリープの違い
 
-- **アイドル状態**: `CONFIG_ZMK_IDLE_TIMEOUT` (デフォルト 30000 ms) で遷移。Kconfig 上の ON/OFF スイッチは存在せず常時有効。Central Processing Unit (CPU) クロック低下と Bluetooth Low Energy (BLE) 通信頻度低下によりバックグラウンドで省電力化
-- **ディープスリープ**: `CONFIG_ZMK_SLEEP=y` が必須（デフォルト `n`）。有効時は `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT` (デフォルト 900000 ms = 15 分) で遷移。nice!nano v2 で約 20 μA まで電流が下がる
-- 復帰は `kscan` ノードの `wakeup-source` プロパティによる Global Purpose Input/Output (GPIO) 割込み。任意キー押下で復帰するが、分割キーボードではセントラル側のキーを押すのが確実
+- **アイドル状態**: `CONFIG_ZMK_IDLE_TIMEOUT` (デフォルト 30000 ms) で遷移. Kconfig 上の ON/OFF スイッチは存在せず常時有効. Central Processing Unit (CPU) クロック低下と Bluetooth Low Energy (BLE) 通信頻度低下によりバックグラウンドで省電力化
+- **ディープスリープ**: `CONFIG_ZMK_SLEEP=y` が必須(デフォルト `n`). 有効時は `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT` (デフォルト 900000 ms = 15 分) で遷移. nice!nano v2 で約 20 μA まで電流が下がる
+- 復帰は `kscan` ノードの `wakeup-source` プロパティによる Global Purpose Input/Output (GPIO) 割込み. 任意キー押下で復帰するが, 分割キーボードではセントラル側のキーを押すのが確実
 
 ### nice!view の表示が消えない件
 
-`CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` の Kconfig 定義（v0.3.0 `app/src/display/Kconfig`）：
+`CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` の Kconfig 定義(v0.3.0 `app/src/display/Kconfig`):
 
 ```kconfig
 config ZMK_DISPLAY_BLANK_ON_IDLE
@@ -37,15 +37,42 @@ config ZMK_DISPLAY_BLANK_ON_IDLE
     default y if SSD1306
 ```
 
-nice!view は Sharp Memory-in-Pixel LCD (LS011B7DH03) であり SSD1306 ではないため、デフォルトでブランクされない。これは仕様通りの挙動であって不具合ではない。メモリ LCD は表示維持コストが極めて低く、積極的にブランクする利得が乏しいための判断と推察される。
+nice!view は Sharp Memory-in-Pixel LCD (LS011B7DH03) であり SSD1306 ではないため, デフォルトでブランクされない. これは仕様通りの挙動であって不具合ではない. メモリ LCD は表示維持コストが極めて低く, 積極的にブランクする利得が乏しいための判断と推察される.
 
 ### 実施した変更
 
-`config/corne.conf` に以下を追記し、ディープスリープを有効化（commit `ae997c8`、push 済み）：
+`config/corne.conf` に以下を追記し, ディープスリープを有効化(commit `ae997c8`, push 済み):
 
 ```conf
 # Enable deep sleep (idle sleep timeout defaults to 15 minutes)
 CONFIG_ZMK_SLEEP=y
 ```
 
-これにより 15 分無操作でディープスリープへ遷移する。実機検証は未実施。
+これにより 15 分無操作でディープスリープへ遷移する. 実機検証は未実施.
+
+---
+
+## 2026-06-16: FJ08K-B10K 導入に伴う電源管理の追加検討
+
+### FJ08K のスタンバイ消費
+
+FJ08K-B10K の各軸ポテンショメータは VCC-GND 間に常時電流を流す. 3.3 V 駆動, 各軸 10 kΩ の場合:
+
+- 1 軸あたり 3.3 V ÷ 10 kΩ = 0.33 mA
+- X + Y の 2 軸合計: 約 0.66 mA
+
+nice!nano v2 のアイドル時消費 (数 mA 台) と比較して無視できないため, 省電力対策が必要.
+
+### アイドル時の対策
+
+アイドル遷移(30 秒)のタイミングで ADC サンプリングを停止し, MCU のウェイクアップ頻度を下げる. ポテンショメータへの電力供給は継続するが, 読み取りを止めることで MCU 側の消費を抑制する.
+
+### ディープスリープ時の対策
+
+GPIO で FJ08K の VCC を切断し, ポテンショメータへの電力供給ごと止める. これにより 0.66 mA の定常消費を排除できる.
+
+**制約**: ジョイスティック操作では ADC に電力が入らないためウェイクアップを検知できない. ディープスリープからの復帰はキーマトリクスの任意キー押下に限られる. この制約は許容する方針.
+
+### nice!view の挙動(確認)
+
+Sharp Memory-in-Pixel LCD (LS011B7DH03) は双安定ディスプレイであり, アイドル・ディープスリープのいずれでも表示内容を保持する. バックライトもなく, 表示維持コストは極めて低い. `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` は引き続き設定しない.
