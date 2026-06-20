@@ -4,10 +4,9 @@
 
 - [ ] ディープスリープ有効化後の実機検証(15 分無操作 → ディープスリープ遷移と任意キー押下による復帰)
 - [ ] 必要なら `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=y` を追加して nice!view を 30 秒で消灯させるかを判断(消費電力上の優先度は低い)
-- [ ] D21 未接続確認: `corne_right.overlay`(D21 削除・col-offset=7)を右手側にフラッシュし全キー動作を確認 → D21 が FJ08K ADC に転用可能なことを実証
 - [ ] FJ08K-B10K 実装: PCB トレースカット + ジャンパ線(Col 4: D20 → D16)の実機加工
 - [ ] FJ08K-B10K 実装: `zmk-analog-input-driver` + `zmk-input-processor-xyz` (badjeff) を `config/west.yml` へ追加(revision 確定済み)
-- [ ] FJ08K-B10K 実装: overlay 命名問題の方針決定 — 案 A (keymap 集約) vs 案 B (overlay ファイル分離) を確定し devicetree 実装に着手
+- [ ] FJ08K-B10K 実装: right-side-only devicetree 変更を `corne.keymap` の `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックに実装(案 A 確定)
 - [ ] FJ08K-B10K 実装: `corne_right.conf` を新規作成(`CONFIG_ANALOG_INPUT=y` + `CONFIG_ANALOG_INPUT_REPORT_INTERVAL_MIN=22`)
 - [ ] FJ08K-B10K 実装: right overlay / left overlay / shared `.dtsi` の作成(`zmk,input-split` 構成)
 - [ ] FJ08K-B10K 実装: 実ビルドで badjeff モジュールと ZMK v0.3.0 の互換性を検証
@@ -27,3 +26,5 @@
 - [x] CI ビルド失敗の修正(GitHub Actions ワークフローのタグを `@main` → `@v0.3.0` に揃え, `west.yml` と整合)
 - [x] `five_column_transform` 適用下での未使用列ピン特定 → Col 5 (D21/P0.31/AIN7) が物理未使用と確認
 - [x] ポインティングデバイス増設方針の決定 → FJ08K-B10K (右手側ペリフェラル, `zmk,input-split` 経由) を採用
+- [x] D21 未接続確認: D21 削除 + col-offset=7 を `corne.keymap` の `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックで適用し右手側をフラッシュ → 全キー正常動作を確認. D21 は Chocofi PCB 上でいずれのキースイッチにも接続されておらず, FJ08K ADC への転用が可能と実証
+- [x] overlay 命名問題の方針決定 → 案 A (devicetree 変更を `corne.keymap` の `#ifdef` ブロックに集約) を採用・実証済み

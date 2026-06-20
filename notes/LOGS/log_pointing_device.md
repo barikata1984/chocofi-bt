@@ -312,3 +312,25 @@ D21 がキースイッチに接続されていないことを実機で確認す�
 - `col-offset` を 6 → 7 に変更(右手列番号のオフセット調整)
 
 右手側にフラッシュして全キーが正常動作することを確認できれば, D21 がいずれのキースイッチにも接続されていないことの実証となる. 検証は未実施.
+
+---
+
+## 2026-06-20: overlay 命名問題の解決と D21 未接続の実機確認
+
+### CI ビルドエラーと原因
+
+前回作成した `config/corne_right.overlay` を CI でビルドしたところ, `undefined node label 'kscan0'` エラーが発生した.
+
+根本原因: ZMK のビルドシステムはユーザー config overlay をシールド overlay より先に処理する. そのため, `corne.dtsi` で定義されるシールドラベル (`kscan0` 等) はユーザー overlay の処理時点ではまだ存在せず, 参照できない. これが ZMK Issue #1382 の実態であり, ユーザー `corne_right.overlay` から `&kscan0` を参照するコードは原理的にビルドできない.
+
+### 修正方針と実装
+
+`config/corne_right.overlay` を削除し, D21 削除と `col-offset` 変更を `config/corne.keymap` の `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックに移動した. keymap ファイルはすべての overlay 処理後に適用されるため, シールドラベルを問題なく参照できる. また `GPIO_ACTIVE_HIGH` を使うために `#include <dt-bindings/gpio/gpio.h>` を追加した.
+
+この方針が案 A(devicetree 変更を keymap に集約)であり, 実装と CI パスにより確定した.
+
+### CI ビルドと実機検証の結果
+
+CI ビルドが成功した. CI ログから左手ビルド (`CONFIG_SHIELD_CORNE_LEFT=y`) は `#ifdef` ブロックに入らず, 標準 6 列 `col-gpios` が保持されていることを確認した.
+
+両側をフラッシュし実機で全キーの動作を確認した. D21 を `col-gpios` から削除した状態で右手の全キーが正常動作したことにより, Chocofi PCB 上の D21 (P0.31/AIN7) はいずれのキースイッチにも接続されていないことが実証された. D21 は FJ08K ADC ピンとして PCB 加工なしに転用可能.

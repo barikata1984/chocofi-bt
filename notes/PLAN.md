@@ -31,11 +31,13 @@
 - **ADC ピン確保策**:
   - ADC ピン 1: Col 5 (D21/P0.31/AIN7) — 5col Chocofi では物理未使用のため PCB 加工不要
   - ADC ピン 2: Col 4 を D20 (P0.29/AIN5) から D16 (P0.10, 非 ADC) へ PCB トレースカット + ジャンパ線で移設し, D20/AIN5 を解放
-  - ソフトウェア: `corne_right.overlay` の `col-gpios` を書き換え (D20 → D16, D21 を削除)
+  - ソフトウェア: `corne.keymap` の `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックで `col-gpios` を書き換え (D20 → D16, D21 を削除)
 - **ZMK モジュール**: `zmk-analog-input-driver` (badjeff) を `config/west.yml` へ追加
+- **overlay 命名問題 (解決済み)**: `config/corne_right.overlay` はユーザー overlay が shield overlay より先に処理されるため, shield ラベル (`kscan0` 等) を参照できずビルドエラーになる(ZMK Issue #1382). 案 A(devicetree 変更を `corne.keymap` に集約)を採用・実証済み. `corne_right.overlay` は使用しない.
 - **ソフトウェア構成**:
   - `config/corne.dtsi` (新規, 共有): `zmk,input-split` 定義 + `zmk,input-listener` を `status = "disabled"` で宣言
-  - `config/corne_right.overlay` (新規): FJ08K (`zmk,analog-input`) デバイスノード定義, input-split へ接続, `col-gpios` 書き換え (D20 → D16, D21 削除)
+  - `config/corne.keymap` (既存): 右手側専用 devicetree 変更 (`col-gpios` 書き換え, D21 削除, col-offset 調整) を `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックに記述. 左手側専用変更は `#ifdef CONFIG_SHIELD_CORNE_LEFT` ブロックに記述. keymap はすべての overlay 処理後に適用されるため shield ラベルが利用可能
+  - `config/corne_right.overlay`: **使用しない**. 右手側 devicetree 変更は `corne.keymap` で行う
   - `config/corne_left.overlay` (新規): `zmk,input-listener` を `status = "okay"` で enable
   - `config/corne_right.conf` (新規): `CONFIG_ANALOG_INPUT=y` + `CONFIG_ANALOG_INPUT_REPORT_INTERVAL_MIN=22` のみ記載. `CONFIG_ADC` は `ANALOG_INPUT` が自動選択, `CONFIG_INPUT` は `ZMK_POINTING` が自動選択するため明示しない. input-split / input-listener / input-processor-xyz も DT ノードで自動 enable
   - `config/corne_left.conf`: 不要(input-listener 等はすべて DT auto-enable)
@@ -47,7 +49,6 @@
   - `zmk-analog-input-driver`: revision `2684f22ee7e2168d4393f7e63676912210a796fc`
   - `zmk-input-processor-xyz`: revision `0f0574f6a6c5b08fa964dff7b957ce67b2e0a9cf`
   - 両モジュールとも追加の依存 project は不要
-- **overlay 命名問題 (未決定)**: `config/corne_right.overlay` が in-tree shield で確実に適用されない可能性あり(ZMK Issue #1382). 案 A(devicetree 変更を corne.keymap に集約)と案 B(overlay ファイル分離, 現方針)のどちらを採るか確定前に devicetree 実装には着手しない
 
 ### キー入力タイミング方針
 

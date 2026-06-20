@@ -24,16 +24,6 @@ ADC を常時ポーリングするため消費電力が増大する.
 
 FJ08K 中点電圧は個体差あり. `CONFIG_ANALOG_INPUT_LOG_DBG_RAW=y` で実測してから `mv-mid` を設定する必要がある.
 
-## [FJ08K] overlay 命名問題 (重要)
-
-`config/corne_right.overlay` が in-tree shield ではビルドシステムに確実に適用されない可能性がある(ZMK Issue #1382).
-
-対処案:
-- 案 A: devicetree 変更を `corne.keymap` に集約(確実に適用される)
-- 案 B: overlay ファイル分離(PLAN.md の現方針だが適用されないリスクあり)
-
-方針未決定. devicetree 実装着手前に確定が必要.
-
 ## [FJ08K] badjeff モジュールの ZMK v0.3.0 互換性が未検証
 
 `zmk-analog-input-driver` / `zmk-input-processor-xyz` は fork 前提で開発されているとの指摘があり, upstream v0.3.0 でビルドできない可能性がある.
