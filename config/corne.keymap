@@ -185,7 +185,6 @@
     };
 };
 
-#ifdef CONFIG_SHIELD_CORNE_RIGHT
 &kscan0 {
     col-gpios
         = <&pro_micro 14 GPIO_ACTIVE_HIGH>
@@ -195,4 +194,3 @@
         , <&pro_micro 20 GPIO_ACTIVE_HIGH>
         ;
 };
-#endif
