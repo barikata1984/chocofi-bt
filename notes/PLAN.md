@@ -29,21 +29,22 @@
 - **採用デバイス**: FJ08K-B10K(2 軸アナログジョイスティック, 各軸 10 kΩ ポテンショメータ, 自動センタリング, THT 5 ピン)
 - **実装側**: 右手側ペリフェラル. セントラルを左のまま変更しない(ZMK の `zmk,input-split` がペリフェラル側ポインティングデバイスを BLE 経由でセントラルへ転送するため)
 - **ADC ピン確保策**:
-  - ADC ピン 1: Col 5 (D21/P0.31/AIN7) — 5col Chocofi では物理未使用のため PCB 加工不要
-  - ADC ピン 2: Col 4 を D20 (P0.29/AIN5) から D16 (P0.10, 非 ADC) へ PCB トレースカット + ジャンパ線で移設し, D20/AIN5 を解放
-  - ソフトウェア: `corne.keymap` の `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックで `col-gpios` を書き換え (D20 → D16, D21 を削除)
+  - ADC ピン 1: Col 5 (D21/P0.31/AIN7) — 5col Chocofi では物理未使用のため PCB 加工不要と推定(ファームウェアによる実証は未完了)
+  - ADC ピン 2: Col 4 を D19 (P0.02/AIN0) から D10 (P0.09, 非 ADC) へ PCB トレースカット + ジャンパ線で移設済み. D19/AIN0 を解放 (当初 D20→D16 の計画だったが, 実際に切断したのは D19 トレース)
+  - ソフトウェア: `corne.keymap` の `#ifdef RIGHT_HALF` ブロックで `col-gpios` を書き換え (D19 → D10, D21 を削除); `build.yaml` の右手側 cmake-args に `DTS_EXTRA_CPPFLAGS=-DRIGHT_HALF` を設定
 - **ZMK モジュール**: `zmk-analog-input-driver` (badjeff) を `config/west.yml` へ追加
-- **overlay 命名問題 (解決済み)**: `config/corne_right.overlay` はユーザー overlay が shield overlay より先に処理されるため, shield ラベル (`kscan0` 等) を参照できずビルドエラーになる(ZMK Issue #1382). 案 A(devicetree 変更を `corne.keymap` に集約)を採用・実証済み. `corne_right.overlay` は使用しない.
+- **per-side DTS 条件分岐方法 (解決済み)**: `#ifdef CONFIG_SHIELD_CORNE_RIGHT` は DTS プリプロセス時に展開されない(Kconfig シンボルは DTS には渡らない)ため, これを使った col-gpios 変更は一度も適用されていなかった. 正しい方法は `build.yaml` の右手側 cmake-args に `DTS_EXTRA_CPPFLAGS=-DRIGHT_HALF` を追加し, `corne.keymap` で `#ifdef RIGHT_HALF` を使うこと. 実機両側フラッシュ・全キー正常動作で確認済み. `corne_right.overlay` は使用しない.
+- **右手側 col-gpios の順序**: 標準 `corne_right.overlay` は D14, D15, D18, D19, D20, D21 の順(左手側は D21 first の逆順). 右手側 col-gpios を変更する際はこの順序を維持すること.
 - **ソフトウェア構成**:
   - `config/corne.dtsi` (新規, 共有): `zmk,input-split` 定義 + `zmk,input-listener` を `status = "disabled"` で宣言
-  - `config/corne.keymap` (既存): 右手側専用 devicetree 変更 (`col-gpios` 書き換え, D21 削除, col-offset 調整) を `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックに記述. 左手側専用変更は `#ifdef CONFIG_SHIELD_CORNE_LEFT` ブロックに記述. keymap はすべての overlay 処理後に適用されるため shield ラベルが利用可能
-  - `config/corne_right.overlay`: **使用しない**. 右手側 devicetree 変更は `corne.keymap` で行う
-  - `config/corne_left.overlay` (新規): `zmk,input-listener` を `status = "okay"` で enable
+  - `config/corne.keymap` (既存): 右手側専用 devicetree 変更 (`col-gpios` 書き換え D19→D10, D21 削除, col-offset 調整) を `#ifdef RIGHT_HALF` ブロックに記述. keymap はすべての overlay 処理後に適用されるため shield ラベルが利用可能
+  - `config/corne_right.overlay`: **使用しない**. 右手側 devicetree 変更は `corne.keymap` の `#ifdef RIGHT_HALF` ブロックで行う
+  - `config/corne_left.overlay`: **使用しない**. `zmk,input-listener` の enable は別の方法で行う(要検討)
   - `config/corne_right.conf` (新規): `CONFIG_ANALOG_INPUT=y` + `CONFIG_ANALOG_INPUT_REPORT_INTERVAL_MIN=22` のみ記載. `CONFIG_ADC` は `ANALOG_INPUT` が自動選択, `CONFIG_INPUT` は `ZMK_POINTING` が自動選択するため明示しない. input-split / input-listener / input-processor-xyz も DT ノードで自動 enable
   - `config/corne_left.conf`: 不要(input-listener 等はすべて DT auto-enable)
   - `config/corne.conf` (既存): 変更不要. `CONFIG_ZMK_POINTING=y` / `CONFIG_ZMK_DISPLAY=y` / `CONFIG_ZMK_SLEEP=y` が既存のまま有効
-  - input-listener の配置方法: 共有 dtsi で disabled 宣言 → セントラル overlay で enable する ZMK 公式パターンを採用
-  - `build.yaml` の変更不要 (ファイル名が正しければビルドシステムが自動検出)
+  - input-listener の配置方法: 共有 dtsi で disabled 宣言 → セントラル overlay で enable する ZMK 公式パターンを採用(overlay は使わず `#ifdef` guard で代替する可能性あり)
+  - `build.yaml`: 右手側ビルドの cmake-args に `DTS_EXTRA_CPPFLAGS=-DRIGHT_HALF` を追加済み. 左手側には追加しない
 - **west.yml モジュール追加** (revision 確定済み):
   - badjeff remote: `url-base: https://github.com/badjeff`
   - `zmk-analog-input-driver`: revision `2684f22ee7e2168d4393f7e63676912210a796fc`

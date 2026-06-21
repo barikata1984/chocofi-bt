@@ -334,3 +334,48 @@ D21 がキースイッチに接続されていないことを実機で確認す�
 CI ビルドが成功した. CI ログから左手ビルド (`CONFIG_SHIELD_CORNE_LEFT=y`) は `#ifdef` ブロックに入らず, 標準 6 列 `col-gpios` が保持されていることを確認した.
 
 両側をフラッシュし実機で全キーの動作を確認した. D21 を `col-gpios` から削除した状態で右手の全キーが正常動作したことにより, Chocofi PCB 上の D21 (P0.31/AIN7) はいずれのキースイッチにも接続されていないことが実証された. D21 は FJ08K ADC ピンとして PCB 加工なしに転用可能.
+
+---
+
+## 2026-06-21: #ifdef 無効判明・D19 トレースカット・DTS_EXTRA_CPPFLAGS 解決
+
+### 右手側 col-gpios 順序の修正
+
+`corne_right.overlay` (ZMK 標準シールド) の `col-gpios` は D14, D15, D18, D19, D20, D21 の順であることを確認した.
+これは左手側 (`corne_left.overlay`: D21, D20, D19, D18, D15, D14) と逆順になっている.
+前回調査で右手側の順序を誤って認識していたため, col-gpios 変更計画の前提が崩れていた.
+
+### `#ifdef CONFIG_SHIELD_CORNE_RIGHT` が機能しない問題
+
+CI ビルドログを精査した結果, `corne.keymap` の `#ifdef CONFIG_SHIELD_CORNE_RIGHT` ブロックは DTS プリプロセス時に評価されないことが判明した.
+Kconfig シンボル (`CONFIG_SHIELD_CORNE_RIGHT`) は DTS プリプロセッサには渡らないため, ブロック内のコードは左右いずれのビルドでも展開されない.
+
+この問題により, D21 削除テストとして意図した前回の実機検証は無効だった.
+右手側フラッシュ後に全キーが正常動作したのは, col-gpios 変更が適用されず元の 6 列 col-gpios がそのまま使われたためである.
+D21 がキースイッチに接続されていないかどうかのファームウェアによる実証は, いまだ完了していない.
+
+### D19 トレースカットと D10 ジャンパ線
+
+当初 Col 4 の移設先を D20 (P0.29/AIN5) → D16 (P0.10) と計画していたが, 実際に切断したのは D19 (P0.02/AIN0) のトレースだった.
+ジャンパ先は D10 (P0.09).
+
+変更後の ADC ピン状況:
+- ADC ピン 1: D21/P0.31/AIN7 (Col 6 相当, 物理的に未使用と推定, 実証未完了)
+- ADC ピン 2: D19/P0.02/AIN0 (Col 4 相当, トレースカット + D10 ジャンパ線で解放済み)
+
+### per-side DTS 条件分岐の解決: DTS_EXTRA_CPPFLAGS
+
+`build.yaml` の右手側ビルドエントリに以下を追加することで解決した:
+
+```yaml
+cmake-args: -DDTS_EXTRA_CPPFLAGS=-DRIGHT_HALF
+```
+
+これにより DTS プリプロセス時に `RIGHT_HALF` マクロが定義され, `corne.keymap` の `#ifdef RIGHT_HALF` ブロックが右手側ビルドでのみ展開される.
+左手側ビルドには cmake-args を追加しないため, ブロックは展開されず標準 col-gpios が維持される.
+
+`corne_right.overlay` および `corne_left.overlay` は引き続き使用しない.
+
+### 実機検証
+
+右手側(D19→D10 ジャンパ線 + `#ifdef RIGHT_HALF` で col-gpios を D10 に変更)と左手側をフラッシュし, 両側で全キーの正常動作を確認した.
