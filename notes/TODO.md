@@ -2,9 +2,10 @@
 
 ## 未着手
 
-- [ ] ディープスリープ有効化後の実機検証(15 分無操作 → ディープスリープ遷移と任意キー押下による復帰)
-- [ ] 必要なら `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=y` を追加して nice!view を 30 秒で消灯させるかを判断(消費電力上の優先度は低い)
-- [ ] D21 未接続の再確認: `DTS_EXTRA_CPPFLAGS=-DRIGHT_HALF` + `#ifdef RIGHT_HALF` で D21 削除 + col-offset=7 を正しく適用し右手側をフラッシュ → 全キー正常動作を確認すること(前回の検証は `#ifdef CONFIG_SHIELD_CORNE_RIGHT` が機能せず無効だった)
+- [ ] PCB 再設計: EasyEDA Pro でインポートした chocofi プロジェクトの目視確認 (元 PCB との差分検証)
+- [ ] PCB 再設計: easyeda-copilot エクステンションを EasyEDA Pro に導入
+- [ ] PCB 再設計: easyeda-copilot MCP サーバーを Claude Code に接続
+- [ ] PCB 再設計: LLM 支援で D20→D16, D19→D10 のピン変更 + アナログジャック追加を試行
 - [ ] FJ08K-B10K 実装: `zmk-analog-input-driver` + `zmk-input-processor-xyz` (badjeff) を `config/west.yml` へ追加(revision 確定済み)
 - [ ] FJ08K-B10K 実装: right-side-only devicetree 変更を `corne.keymap` の `#ifdef RIGHT_HALF` ブロックに実装(`DTS_EXTRA_CPPFLAGS=-DRIGHT_HALF` via build.yaml cmake-args)
 - [ ] FJ08K-B10K 実装: `corne_right.conf` を新規作成(`CONFIG_ANALOG_INPUT=y` + `CONFIG_ANALOG_INPUT_REPORT_INTERVAL_MIN=22`)
@@ -27,3 +28,6 @@
 - [x] `five_column_transform` 適用下での未使用列ピン特定 → Col 5 (D21/P0.31/AIN7) が物理未使用と確認
 - [x] ポインティングデバイス増設方針の決定 → FJ08K-B10K (右手側ペリフェラル, `zmk,input-split` 経由) を採用
 - [x] overlay 命名問題の方針決定 → `DTS_EXTRA_CPPFLAGS=-DRIGHT_HALF` を `build.yaml` の右手側 cmake-args に追加し, `corne.keymap` の `#ifdef RIGHT_HALF` ブロックで DT 変更を実装. 実機両側フラッシュ・全キー正常動作を確認
+- [x] ディープスリープ有効化後の実機検証 → 15 分無操作でディープスリープ遷移, 任意キー押下で復帰を確認. nice!view もディープスリープで消灯する. この挙動で十分
+- [x] nice!view 消灯検討 → ディープスリープ時に自動消灯するため `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` の追加は不要と判断
+- [x] D21 未接続の確認 → `#ifdef RIGHT_HALF` で col-gpios から D21 削除済み (D14, D15, D18, D10, D20 の 5 ピン構成). 実機で全キー正常動作を確認
